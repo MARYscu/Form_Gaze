@@ -3,8 +3,11 @@ import motion
 import time
 from naoqi import ALProxy
 
+
+
 #reference
 # http://www.cs.cmu.edu/~cga/nao/doc/reference-documentation/nao/hardware/kinematics/nao-joints-32.html#hardware-kin-v3-2-left-arm-joints
+
 
 def StiffnessOn(proxy):
     # We use the "Body" name to signify the collection of all joints
@@ -14,8 +17,6 @@ def StiffnessOn(proxy):
     proxy.stiffnessInterpolation(pNames, pStiffnessLists, pTimeLists)
 
 def StiffnessOff(proxy):
-    # make sure the robot sits down
-    proxy.goToPosture("Sit", 1.0)
     # We use the "Body" name to signify the collection of all joints
     pNames = "Body"
     pStiffnessLists = 0.0
@@ -25,11 +26,8 @@ def StiffnessOff(proxy):
 
 # NAO Speaking Functions
 def greeting(greetingProxy):
-    greeting_script = "greeting script"
+    greeting_script = "Hello"
     greetingProxy.say(greeting_script)
-
-
-def game_rule(greetingProxy):
     game_rule = "game rule script"
     greetingProxy.say(game_rule)
 
@@ -40,86 +38,138 @@ def human_control_response(greetingProxy):
 
 
 # NAO idle behavior
-def idleHead(motionProxy):
+def idleHeadR(motionProxy):
+    # 20s idle behavior
     # Set stiffness on for Head motors
     motionProxy.setStiffnesses("Head", 0.8)
     names= ["HeadYaw", "HeadPitch"]
-    targetAngles = [[0.0, -1.0, 0.0], [0.0, -1.0, 0.0]]
-    timeList = [[1.0, 4.0, 7.0], [1.0, 4.0, 7.0]]
+    targetAngles = [[0.0, -0.4], [0.0, -0.4]]
+    timeList = [[1.0, 4.0], [1.0, 4.0]]
     isAbsolute = True
     motionProxy.angleInterpolation(names, targetAngles, timeList, isAbsolute)
-    time.sleep(4.0)
-    names= ["HeadYaw", "HeadPitch"]
-    targetAngles = [[0.0, 1.0, 0.0], [0.0, -1.0, 0.0]]
-    timeList = [[1.0, 4.0, 7.0], [1.0, 3.0, 7.0]]
-    isAbsolute = True
+    # time.sleep(10.0)
+    targetAngles = [[-0.4, 0], [-0.4, 0]]
+    timeList = [[1.0, 4.0], [1.0, 4.0]]
     motionProxy.angleInterpolation(names, targetAngles, timeList, isAbsolute)
-    time.sleep(4.0)
     motionProxy.setStiffnesses("Head", 0)
 
-# NAO Distraction
 
-def arm_move(motionProxy, effectorName):
 
-    # Set NAO in Stiffness On
-    StiffnessOn(motionProxy)
+def idleHeadL(motionProxy):
+    # 20s idle behavior
+    # Set stiffness on for Head motors
+    motionProxy.setStiffnesses("Head", 0.8)
+    names= ["HeadYaw", "HeadPitch"]
+    targetAngles = [[0.0, 0.4], [0.0, -0.4]]
+    timeList = [[1.0, 4.0], [1.0, 4.0]]
+    isAbsolute = True
+    motionProxy.angleInterpolation(names, targetAngles, timeList, isAbsolute)
+    # time.sleep(10.0)
+    targetAngles = [[0.4, 0], [-0.4, 0]]
+    timeList = [[1.0, 4.0], [1.0, 4.0]]
+    motionProxy.angleInterpolation(names, targetAngles, timeList, isAbsolute)
+    motionProxy.setStiffnesses("Head", 0)
 
-    space = motion.FRAME_ROBOT
-    useSensor = False
 
-    effectorInit = motionProxy.getPosition(effectorName, space, useSensor)
+def idleWrist(motionProxy):
+    motionProxy.setStiffnesses("RWristYaw", 0.8)
+    motionProxy.angleInterpolation("RWristYaw", [0.3, 0.7, 1.29], [1.0, 3.0, 5.0], True)
+    # time.sleep(5)
+    motionProxy.angleInterpolation("RWristYaw", -0.46, 1.0, True)
+    motionProxy.setStiffnesses("RWristYaw", 0)
 
-    # Active LArm tracking
-    isEnabled = True
-    motionProxy.wbEnableEffectorControl(effectorName, isEnabled)
 
-    # Example showing how to set position target for LArm
-    # The 3 coordinates are absolute LArm position in NAO_SPACE
-    # Position in meter in x, y and z axis.
 
-    # X Axis LArm Position feasible movement = [ +0.00, +0.12] meter
-    # Y Axis LArm Position feasible movement = [ -0.05, +0.10] meter
-    # Y Axis RArm Position feasible movement = [ -0.10, +0.05] meter
-    # Z Axis LArm Position feasible movement = [ -0.10, +0.10] meter
+def ArmControl_R_Waving(motionProxy):
+    # Set stiffness on for Head motors
 
-    coef = 1.0
-    if (effectorName == "LArm"):
-        coef = +1.0
-    elif (effectorName == "RArm"):
-        coef = -1.0
+    print("ARM Control")
+    # Initiate the Joints
+    joints_R = ["RShoulderPitch", "RElbowRoll", "RShoulderRoll", "RElbowYaw", "RWristYaw"]
+    default = {"RShoulderPitch": 1.54, "RWristYaw": -0.46, "RElbowYaw": 0.86, "RShoulderRoll": -0.4, "RElbowRoll": 1}
+    isAbsolute = True
+    for joint in joints_R:
+        motionProxy.setStiffnesses(joint, 0.8)
 
-    targetCoordinateList = [ [ +0.12, +0.00*coef, +0.00], [ +0.12, +0.00*coef, -0.10]]
-    # [ +0.12, +0.00*coef, +0.00],  # target 0
-    # [ +0.12, +0.00*coef, -0.10], # target 1
-    # [ +0.12, +0.05*coef, -0.10], # target 1
-    # [ +0.12, +0.05*coef, +0.10], # target 2
-    # [ +0.12, -0.10*coef, +0.10], # target 3
-    # [ +0.12, -0.10*coef, -0.10], # target 4
-    # [ +0.12, +0.00*coef, -0.10], # target 5
-    # [ +0.12, +0.00*coef, +0.00], # target 6
-    # [ +0.00, +0.00*coef, +0.00], # target 7
+    for k,v in default.items():
+        motionProxy.angleInterpolation(k, v, 1.0, isAbsolute)
 
-    # wbSetEffectorControl is a non blocking function
-    # time.sleep allow head go to his target
-    # The recommended minimum period between two successives set commands is
-    # 0.2 s.
-    for targetCoordinate in targetCoordinateList:
-        targetCoordinate = [targetCoordinate[i] + effectorInit[i] for i in range(3)]
-        motionProxy.wbSetEffectorControl(effectorName, targetCoordinate)
-        time.sleep(4.0)
+    # Raise hand and Wave
+    names= ["RShoulderPitch", "RElbowRoll"]
+    targetAngles = [[0, -0.78], [0.2, 1.3]]
+    timeList = [[1.0, 2.0], [2.0, 4.0]]
 
-    # Deactivate Head tracking
-    isEnabled    = False
-    motionProxy.wbEnableEffectorControl(effectorName, isEnabled)
+    motionProxy.angleInterpolation(names, targetAngles, timeList, isAbsolute)
 
-def sit(postureProxy):
-    postureProxy.goToPosture("SitRelax", 1.0)
-    # postureProxy.goToPosture("StandZero", 1.0)
-    # postureProxy.goToPosture("LyingBelly", 1.0)
-    # postureProxy.goToPosture("LyingBack", 1.0)
-    # postureProxy.goToPosture("Stand", 1.0)
-    # postureProxy.goToPosture("Crouch", 1.0)
-    # postureProxy.goToPosture("Sit", 1.0)
+    # back to default
+    for k,v in default.items():
+        motionProxy.angleInterpolation(k, v, 1.0, isAbsolute)
+    for joint in joints_R:
+        motionProxy.setStiffnesses(joint, 0)
+    print("ARM Control End")
+
+
+def HandControl_R(motionProxy):
+
+    print("RHAND CONTROL")
+    # Initiate the Joints
+    joints_R = ["RShoulderPitch", "RElbowRoll", "RShoulderRoll", "RElbowYaw", "RWristYaw"]
+    default_R = {"RShoulderPitch": 1.54, "RWristYaw": -0.46, "RElbowYaw": 0.86, "RShoulderRoll": -0.4, "RElbowRoll": 1}
+    isAbsolute = True
+    for joint in joints_R:
+        motionProxy.setStiffnesses(joint, 0.8)
+
+    for k,v in default_R.items():
+        motionProxy.angleInterpolation(k, v, 1.0, isAbsolute)
+
+    motionProxy.angleInterpolation(["RShoulderRoll", "RElbowYaw", "RWristYaw", "RElbowRoll"], [-0.59, 1, 1.7, 1.5], 1, isAbsolute)
+
+
+    motionProxy.openHand('RHand')
+    time.sleep(0.5)
+    motionProxy.closeHand('RHand')
+
+    for k,v in default_R.items():
+        motionProxy.angleInterpolation(k, v, 1.0, isAbsolute)
+
+    for joint in joints_R:
+        motionProxy.setStiffnesses(joint, 0)
+
+
+    print("RHAND CONTROL END")
+
+
+
+# Left Arm is Broken
+def HandControl_L(motionProxy):
+
+    print("LHAND CONTROL")
+    # Initiate the Joints
+    joints_L = ["LShoulderPitch", "LElbowRoll", "LShoulderRoll", "LElbowYaw", "LWristYaw"]
+    default_L = {"LShoulderPitch": 1, "LWristYaw": -0.6, "LElbowYaw": -0.8, "LShoulderRoll": 0.35, "LElbowRoll": -0.6}
+    isAbsolute = True
+    for joint in joints_L:
+        motionProxy.setStiffnesses(joint, 0.8)
+
+    for k,v in default_L.items():
+        motionProxy.angleInterpolation(k, v, 1.0, isAbsolute)
+
+    motionProxy.angleInterpolation(["LShoulderPitch", "LWristYaw", "LElbowRoll", "RElbowYaw"], [1.3, -1.8, -1.4, -1.7], 1, isAbsolute)
+
+
+    motionProxy.openHand('LHand')
+
+    time.sleep(0.5)
+    motionProxy.closeHand('LHand')
+
+
+    for k,v in default_L.items():
+        motionProxy.angleInterpolation(k, v, 1.0, isAbsolute)
+
+    for joint in joints_L:
+        motionProxy.setStiffnesses(joint, 0)
+    print("LHAND CONTROL END")
+
 
 
 def main(robotIP):
@@ -141,56 +191,56 @@ def main(robotIP):
     except Exception as e:
         print("Could not create proxy to ALTextToSpeech", e)
 
+    time.sleep(1)
+    StiffnessOff(motionProxy)
+    motionProxy.openHand('LHand')
+    motionProxy.openHand('RHand')
+    time.sleep(1)
+
+    print("Greeting")
+    greeting(greetingProxy)
+
     start = time.time()
     time_passed = time.time() - start
 
-    while time_passed < 600:
+    idle_index = -1
+    while time_passed < 60:
         time_passed = time.time() - start
-        if time_passed == 20:
-            greeting(greetingProxy)
-            game_rule(greetingProxy)
-        elif 200 >= time_passed >= 180:
-            arm_move(motionProxy, "LArm")
-            motionProxy.openHand('LHand')
-        elif 500 >= time_passed >= 480:
-            postureProxy.goToPosture("Stand", 1.0)
-            arm_move(motionProxy, "RArm")
-        else:
-            StiffnessOff(robotIp)
-            idleHead(motionProxy)
+        if  15 < time_passed < 18:
+            HandControl_R(motionProxy)
 
-    StiffnessOff(robotIp)
+        elif 50 <time_passed < 60:
+            ArmControl_R_Waving(motionProxy)
+
+        else:
+            print("idle")
+            idle_index = (idle_index + 1) % 2
+            if (idle_index == 1):
+                # 20s
+                print("idle1")
+                idleWrist(motionProxy)
+                # time.sleep(10)
+            else:
+                # 60s
+                print("idle0")
+                idleHeadR(motionProxy)
+                # time.sleep(10)
+                idleHeadL(motionProxy)
+                # time.sleep(10)
+
+
+    StiffnessOff(motionProxy)
+
 
 
 
 if __name__ == "__main__":
-    robotIp = "192.168.2.113"
+    robotIp = "192.168.2.117"
+
 
     if len(sys.argv) <= 1:
-        print("Usage python alrobotposture.py robotIP (optional default: 192.168.2.113)")
+        print("Usage python alrobotposture.py robotIP (optional default: 192.168.2.117)")
     else:
         robotIp = sys.argv[1]
 
-
-    # testing
-    while True:
-        NAObehavior = int(input("Please enter the behavior:\n\
-            (0: exit 1: greeting 2: game rule 3: human control response 4:move left arm\
-            5: move right arm): "))
-        try:
-            if NAObehavior == 1:
-                greeting(robotIp)
-            if NAObehavior == 2:
-                game_rule(robotIp)
-            if NAObehavior == 3:
-                human_control_response(robotIp)
-            if NAObehavior == 4:
-                arm_move(robotIp, "LArm")
-            if NAObehavior == 5:
-                arm_move(robotIp, "RArm")
-            if NAObehavior == 0:
-                StiffnessOff(robotIp)
-                break
-        except ValueError:
-            print("Wrong Input")
-            continue
+    main(robotIp)
