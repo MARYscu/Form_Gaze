@@ -1,0 +1,3 @@
+int64 highScore
+int64 roundsComplete
+int64 losses
