@@ -1,5 +1,4 @@
 import sys
-import motion
 import time
 import random
 from naoqi import ALProxy
@@ -74,10 +73,16 @@ def idleHeadL(motionProxy):
 
 def idleWrist(motionProxy):
     motionProxy.setStiffnesses("RWristYaw", 0.8)
+    motionProxy.setStiffnesses("RElbowYaw", 0.8)
+    motionProxy.angleInterpolation("RElbowYaw", [1, 1.3, 2], [1.0, 2.0, 3.0], True)
     motionProxy.angleInterpolation("RWristYaw", [0.3, 0.7, 1.29], [1.0, 3.0, 5.0], True)
     # time.sleep(5)
+
     motionProxy.angleInterpolation("RWristYaw", -0.46, 1.0, True)
+    motionProxy.angleInterpolation("RElbowYaw", 0.86, 1.0, True)
     motionProxy.setStiffnesses("RWristYaw", 0)
+    motionProxy.setStiffnesses("RElbowYaw", 0)
+
 
 
 
@@ -123,7 +128,11 @@ def HandControl_R(motionProxy):
     for k,v in default_R.items():
         motionProxy.angleInterpolation(k, v, 1.0, isAbsolute)
 
-    motionProxy.angleInterpolation(["RShoulderRoll", "RElbowYaw", "RWristYaw", "RElbowRoll"], [-0.59, 1, 1.7, 1.5], 1, isAbsolute)
+    motionProxy.angleInterpolation("RShoulderPitch", 0.89, 1, isAbsolute)
+    motionProxy.angleInterpolation("RShoulderRoll", -0.61, 1, isAbsolute)
+    motionProxy.angleInterpolation("RElbowRoll", 0.5, 1, isAbsolute)
+    motionProxy.angleInterpolation("RElbowYaw", 1 , 1, isAbsolute)
+    motionProxy.angleInterpolation("RWristYaw", 1.7, 1, isAbsolute)
 
 
     motionProxy.openHand('RHand')
@@ -173,19 +182,16 @@ def HandControl_L(motionProxy):
 
 
 def idleBehavior(motionProxy):
-    rand_int = random.randint(0, 2)
-    if (rand_int%2 == 1):
+    rand_int = random.randint(0, 1)
+    if (rand_int%2 == 0):
         # 20s
         print("idle1")
         idleWrist(motionProxy)
         # time.sleep(10)
     else:
         # 60s
-        print("i  dle0")
+        print("idle0")
         idleHeadR(motionProxy)
         # time.sleep(10)
         idleHeadL(motionProxy)
         # time.sleep(10)
-
-
-    # StiffnessOff(motionProxy)
