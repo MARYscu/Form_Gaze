@@ -6,7 +6,7 @@ import rospy
 from std_msgs.msg import String
 from nao_robot_study.msg import GameState
 from nao_robot_study.msg import TimeState
-from robot_behaviors import idleBehavior
+from robot_behaviors import *
 
 from naoqi import ALProxy
 
@@ -78,35 +78,24 @@ class RobotBehavior:
 
     def releaseNao(self):
         self.speechProxy.say("Ending here")
-        self.StiffnessOff(self.motionProxy)
+        StiffnessOff(self.motionProxy)
 
     def run(self):
         start = time.time()
         self.Nao_initial()
         while not rospy.is_shutdown():
             try:
-                if time.time() - start >= 20:
-                    start = time.time()
+                if 115 <= time.time() - start < 125:
+                    HandControl_R(self.motionProxy)
+                elif 475 <= time.time() - start < 485:
+                    ArmControl_R_Waving(self.motionProxy)
+                
+                if time.time() - start_idle >= 20:
+                    start_idle = time.time()
                     idleBehavior()
-                # time_passed = time.time() - start
-
-                idle_index = -1
-                # if time.time() - start >= 20:
-                #     time_passed = time.time() - start
-                #     if  15 < time_passed < 18:
-                #         self.HandControl_R(self.motionProxy)
-
-                #     elif 50 <time_passed < 60:
-                #         self.ArmControl_R_Waving(self.motionProxy)
-
-                #     else:
-                #         print("idle")
-                #         idle_index = (idle_index + 1) % 2
-
-                #     self.releaseNao()
-
             except KeyboardInterrupt:
                 self.releaseNao()
+           
 
 
 
@@ -122,3 +111,4 @@ if __name__=='__main__':
         start_robot("192.168.2.117", 9559)
     except rospy.ROSInterruptException:
         pass
+
