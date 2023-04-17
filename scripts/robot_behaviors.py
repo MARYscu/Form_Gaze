@@ -173,15 +173,15 @@ def HandControl_L(motionProxy):
 
 
 def idleBehavior(motionProxy):
-    rand_int = random.randint(0, 1)
-    if (rand_int%2 == 0):
+    rand_int = random.randint(0, 2)
+    if (rand_int%2 == 1):
         # 20s
         print("idle1")
         idleWrist(motionProxy)
         # time.sleep(10)
     else:
         # 60s
-        print("idle0")
+        print("i  dle0")
         idleHeadR(motionProxy)
         # time.sleep(10)
         idleHeadL(motionProxy)

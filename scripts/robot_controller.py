@@ -6,18 +6,18 @@ import rospy
 from std_msgs.msg import String
 from nao_robot_study.msg import GameState
 from nao_robot_study.msg import TimeState
-from robot_behaviors import idleBehavior
+from robot_behaviors import idleBehavior, StiffnessOff, HandControl_R, ArmControl_R_Waving, idleWrist
 
 from naoqi import ALProxy
 
-gameInstructions = "Hello! Today you will be playing a memory test game. You will have \
-    10 total minutes from the time you press start game to play the game. \
-        To play the game, press the number tiles in order. Starting from the second round, the numbers on the tiles will \
-            disappear after you press the first number. Try to get past as many rounds as you can!"
+gameInstructions = ["Hello my name is Nao!",  "Today you will be playing a memory test game.", "You will have \
+    7 total minutes from the time you press the start button to play the game.", "To play the game, press the number tiles in order.",
+          "Starting from the second round, the numbers on the tiles will disappear after you press the first number.", 
+          "Try to get past as many rounds as you can!", "When you are ready, press the start game button to begin."]
 
-naoTips = "Nice job! Here are some helpful tips for the game. Try to associate the pattern of the numbers with something easier to remember, \
-    for example, a letter or a shape. Additionally, you might not need to memorize the position of the last number \
-        as it will be the only tile left on the screen once you click all the other numbers."
+naoTips = ["Nice job! Here are some helpful tips for the game.", "Try to associate the pattern of the numbers with something easier to remember, \
+    such as a letter or a shape.", "Additionally, you might not need to memorize the position of the last number, \
+        as it will be the only tile left on the screen once you click all the other numbers."]
 
 class RobotBehavior:
     def __init__(self, host, port):
@@ -26,6 +26,8 @@ class RobotBehavior:
         self.motionProxy = None
         self.host = host
         self.port = port
+        self.instructions = True
+        self.stiffnessoff = StiffnessOff
         rospy.init_node('listener', anonymous=True)
         rospy.Subscriber("game_state", GameState, self.gamescore_msg_callback)
         rospy.Subscriber("time_state", TimeState, self.timestate_msg_callback)
@@ -52,68 +54,73 @@ class RobotBehavior:
             exit(1)
 
     def Nao_initial(self):
-        self.StiffnessOff(self.motionProxy)
+        self.stiffnessoff(self.motionProxy)
         self.motionProxy.openHand('LHand')
         self.motionProxy.openHand('RHand')
         time.sleep(1)
+
+    def idleNaoBehavior(self, event=None):
+        idleBehavior(self.motionProxy)
 
     def gamescore_msg_callback(self, data):
         rospy.loginfo("Game ended.")
         score = data.roundsComplete
         high_score = data.highScore
         losses = data.losses
-        naoLine = "You completed " + str(score) + "rounds. Your current high score is " + str(high_score) + "numbers."
-        self.speechProxy.say(naoLine)
-        if losses == 1:
-            self.speechProxy.say(naoTips)
+        gameInProgress = data.gameStart
+
+        if not gameInProgress:
+            naoLine = "Your final highest score is " + str(high_score) + "numbers. Good job!"
+            self.speechProxy.say(naoLine)
+            rospy.sleep(1)
+            self.speechProxy.say("Thank you for taking part in this study.")
+            rospy.sleep(1)
+            self.speechProxy.say("Please find Kelly or Mary to fill out the post study survey.")
+        elif self.instructions and data.gameStart:
+            idleWrist(self.motionProxy.post)
+            for instruction in gameInstructions:
+                self.speechProxy.say(instruction)
+                rospy.sleep(1)
+            self.instructions = False
+        else:
+            naoLine = "You completed " + str(score) + "rounds."
+            self.speechProxy.say(naoLine)
+            rospy.sleep(1)
+            self.speechProxy.say("Your current high score is " + str(high_score) + "numbers.")
+            if losses == 1:
+                rospy.sleep(3)
+                self.speechProxy.say("It may be helpful to take more time to memorize the positions before pressing the first number.")
 
     def timestate_msg_callback(self, data):
-        minutesRemaining = round(data.minutesLeft / 60)
+        minutesRemaining = int(round(data.minutesLeft / 60))
         rospy.loginfo("time update: %d minutes remaining", minutesRemaining)
-        naoLine = "You have " + str(minutesRemaining) + "minutes remaining."
-        self.speechProxy.say(naoLine)
-
-    def idleBehavior(self):
-        pass
+        if minutesRemaining % 2 == 1:
+            naoLine = "You have " + str(minutesRemaining) + "minutes remaining."
+            self.speechProxy.say(naoLine)
+        elif minutesRemaining == 6:
+            HandControl_R(self.motionProxy)
+        elif minutesRemaining == 4:
+            rospy.sleep(3)
+            for tip in naoTips:
+                self.speechProxy.say(tip)
+                rospy.sleep(1)
+        elif minutesRemaining == 2:
+            ArmControl_R_Waving(self.motionProxy)
 
     def releaseNao(self):
         self.speechProxy.say("Ending here")
-        self.StiffnessOff(self.motionProxy)
+        self.stiffnessoff(self.motionProxy)
 
     def run(self):
-        start = time.time()
+        rospy.loginfo("initialized.")
         self.Nao_initial()
-        while not rospy.is_shutdown():
-            try:
-                if time.time() - start >= 20:
-                    start = time.time()
-                    idleBehavior()
-                # time_passed = time.time() - start
-
-                idle_index = -1
-                # if time.time() - start >= 20:
-                #     time_passed = time.time() - start
-                #     if  15 < time_passed < 18:
-                #         self.HandControl_R(self.motionProxy)
-
-                #     elif 50 <time_passed < 60:
-                #         self.ArmControl_R_Waving(self.motionProxy)
-
-                #     else:
-                #         print("idle")
-                #         idle_index = (idle_index + 1) % 2
-
-                #     self.releaseNao()
-
-            except KeyboardInterrupt:
-                self.releaseNao()
-
-
+        timer = rospy.Timer(rospy.Duration(20), self.idleNaoBehavior)
+        rospy.spin()
+        timer.shutdown()
 
 def start_robot(host, port):
     robot = RobotBehavior(host, port)
-    time.sleep(1)
-    robot.speechProxy.say(gameInstructions)
+    rospy.sleep(1)
     robot.run()
 
 
