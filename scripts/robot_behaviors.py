@@ -33,9 +33,9 @@ def greeting(greetingProxy):
     greetingProxy.say(game_rule)
 
 
-def human_control_response(greetingProxy):
-    response = raw_input("response: ")
-    greetingProxy.say(response)
+# def human_control_response(greetingProxy):
+#     response = raw_input("response: ")
+#     greetingProxy.say(response)
 
 
 # NAO idle behavior
@@ -173,8 +173,6 @@ def HandControl_L(motionProxy):
 
 
 def idleBehavior(motionProxy):
-    start = time.time()
-    time_passed = time.time() - start
     rand_int = random.randint(0, 1)
     if (rand_int%2 == 0):
         # 20s

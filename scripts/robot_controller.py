@@ -1,5 +1,8 @@
-import rospy
 import sys
+import motion
+import time
+from naoqi import ALProxy
+import rospy
 from std_msgs.msg import String
 from nao_robot_study.msg import GameState
 from nao_robot_study.msg import TimeState
@@ -28,7 +31,7 @@ class RobotBehavior:
         rospy.Subscriber("time_state", TimeState, self.timestate_msg_callback)
 
         self.connectNao()
-    
+
     def connectNao(self):
         try:
             self.speechProxy = ALProxy("ALTextToSpeech", self.host, self.port)
@@ -37,16 +40,22 @@ class RobotBehavior:
             exit(1)
 
         try:
-            self.postureProxy = ALProxy("ALRobotPosture", robotIP, 9559)
+            self.postureProxy = ALProxy("ALRobotPosture", self.host, 9559)
         except Exception as e:
             print("Could not create proxy to ALRobotPosture", e)
             exit(1)
 
         try:
-            self.motionProxy = ALProxy("ALMotion", robotIP, 9559)
+            self.motionProxy = ALProxy("ALMotion", self.host, 9559)
         except Exception as e:
             print("Could not create proxy to ALMotion")
             exit(1)
+
+    def Nao_initial(self):
+        self.StiffnessOff(self.motionProxy)
+        self.motionProxy.openHand('LHand')
+        self.motionProxy.openHand('RHand')
+        time.sleep(1)
 
     def gamescore_msg_callback(self, data):
         rospy.loginfo("Game ended.")
@@ -69,17 +78,41 @@ class RobotBehavior:
 
     def releaseNao(self):
         self.speechProxy.say("Ending here")
+        self.StiffnessOff(self.motionProxy)
 
     def run(self):
+        start = time.time()
+        self.Nao_initial()
         while not rospy.is_shutdown():
             try:
-                self.idleBehavior()
+                if time.time() - start >= 20:
+                    start = time.time()
+                    idleBehavior()
+                # time_passed = time.time() - start
+
+                idle_index = -1
+                # if time.time() - start >= 20:
+                #     time_passed = time.time() - start
+                #     if  15 < time_passed < 18:
+                #         self.HandControl_R(self.motionProxy)
+
+                #     elif 50 <time_passed < 60:
+                #         self.ArmControl_R_Waving(self.motionProxy)
+
+                #     else:
+                #         print("idle")
+                #         idle_index = (idle_index + 1) % 2
+
+                #     self.releaseNao()
+
             except KeyboardInterrupt:
                 self.releaseNao()
 
 
+
 def start_robot(host, port):
     robot = RobotBehavior(host, port)
+    time.sleep(1)
     robot.speechProxy.say(gameInstructions)
     robot.run()
 
