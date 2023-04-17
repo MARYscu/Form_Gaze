@@ -52,6 +52,12 @@ class RobotBehavior:
         except Exception as e:
             print("Could not create proxy to ALMotion")
             exit(1)
+            
+        try:
+            self.faceProxy = ALProxy("ALFaceDetection", self.host, 9559)
+        except Exception as e:
+            print("Error when creating speech device proxy:" + str(e))
+            exit(1)
 
     def Nao_initial(self):
         self.stiffnessoff(self.motionProxy)
