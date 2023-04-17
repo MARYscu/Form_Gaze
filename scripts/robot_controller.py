@@ -3,6 +3,7 @@ import sys
 from std_msgs.msg import String
 from nao_robot_study.msg import GameState
 from nao_robot_study.msg import TimeState
+from robot_behaviors import idleBehavior
 
 from naoqi import ALProxy
 
@@ -63,13 +64,16 @@ class RobotBehavior:
         naoLine = "You have " + str(minutesRemaining) + "minutes remaining."
         self.speechProxy.say(naoLine)
 
+    def idleBehavior(self):
+        pass
+
     def releaseNao(self):
         self.speechProxy.say("Ending here")
 
     def run(self):
         while not rospy.is_shutdown():
             try:
-                pass
+                self.idleBehavior()
             except KeyboardInterrupt:
                 self.releaseNao()
 
