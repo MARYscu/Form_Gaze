@@ -1,0 +1,19 @@
+1. All the behaviors start once the nao finishes the introduction and enables the eye-tracking function meanwhile
+   eye_tracking(memoryProxy, faceProxy, motionProxy) returns the position of the head position which nao and the participant can make direct eye contact
+2. idle behaviors switch between AnkleLift(motionProxy); idleHeadR(motionProxy); idleHeadL(motionProxy); idleWrist(motionProxy)
+3. the nao should look at the participant when reporting: Head_Position(motionProxy, position) (position is the value returned by eye_tracking)
+
+TimeLine
+1. game introduction
+2. after 1 minute, idle behaviors start: 
+  idle behaviors switch between AnkleLift(motionProxy); idleHeadR(motionProxy); idleHeadL(motionProxy); idleWrist(motionProxy)
+3. at 2 minutes, distraction behavior:
+  moving both arms up: Raisingbothhands(motionProxy)
+4. at 4 minutes, distraction behavior:
+  Scratching_Head(motionProxy)
+5. at 5 minutes:
+  opening and closing hand: HandControl_R(motionProxy
+6. at 6 minutes:
+  Pointing(motionProxy, greetingProxy)
+7. at 7 minutes:
+  ArmControl_R_Waving(motionProxy)
