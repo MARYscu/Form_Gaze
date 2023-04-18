@@ -116,6 +116,7 @@ class RobotBehavior:
         scoreDiff = data.highScoreDiff
         
         if not gameInProgress:
+            FacetrackingOn(self.faceTracker, self.motionProxy)
             naoLine = "Your final highest score is " + str(high_score) + "numbers. Good job!"
             self.speechProxy.say(naoLine)
             rospy.sleep(1)
