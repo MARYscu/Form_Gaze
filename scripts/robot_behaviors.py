@@ -288,12 +288,17 @@ def Pointing(motionProxy, greetingProxy):
     isAbsolute = True
     for joint in joints_R:
         motionProxy.setStiffnesses(joint, 0.8)
+    for k,v in default_R.items():
+        motionProxy.angleInterpolation(k, v, 1.0, isAbsolute)
 
 
     joints_move = ["RShoulderPitch", "RShoulderRoll", "RElbowYaw",  "RElbowRoll",  "RWristYaw"]
     move_position = [0.21, -0.4,  0.57,  1, -0.9]
+    motionProxy.angleInterpolation("RShoulderRoll", -0.3, 1, isAbsolute)
+    motionProxy.angleInterpolation("RShoulderPitch", 0.3, 1, isAbsolute)
+    motionProxy.angleInterpolation(["RElbowYaw",  "RElbowRoll",  "RWristYaw"], [0.57, 1, -0.9], 1, isAbsolute)
 
-    motionProxy.angleInterpolation(joints_move, move_position, [[1], [1], [2], [2], [2]], isAbsolute)
+    # motionProxy.angleInterpolation(joints_move, move_position, [[1], [1], [2], [2], [2]], isAbsolute)
     time.sleep(5)
     vocal_distraction(greetingProxy)
     time.sleep(5)
