@@ -8,22 +8,29 @@ from naoqi import ALProxy
 #reference
 # http://www.cs.cmu.edu/~cga/nao/doc/reference-documentation/nao/hardware/kinematics/nao-joints-32.html#hardware-kin-v3-2-left-arm-joints
 
-def set_Facetracking_on(faceProxy, motionProxy):
-    """Make a proxy to nao's ALFaceDetection and enable/disable tracking.
+# def set_Facetracking_on(faceProxy, motionProxy):
+#     """Make a proxy to nao's ALFaceDetection and enable/disable tracking.
 
-    """
+#     """
+#     motionProxy.setStiffnesses("Head", 1)
+#     # Enable or disable tracking.
+#     faceProxy.enableTracking(True)
+#     # Just to make sure correct option is set.
+#     print("Is tracking now enabled on the robot?", faceProxy.isTrackingEnabled())
+# def set_Facetracking_off(faceProxy, motionProxy):
+#     # Enable or disable tracking.
+#     faceProxy.enableTracking(False)
+#     motionProxy.setStiffnesses("Head", 0)
+#     # Just to make sure correct option is set.
+#     print("Is tracking now enabled on the robot?", faceProxy.isTrackingEnabled())
+
+def FacetrackingOn(faceTrackerProxy, motionProxy):
     motionProxy.setStiffnesses("Head", 1)
-    # Enable or disable tracking.
-    faceProxy.enableTracking(True)
-    # Just to make sure correct option is set.
-    print("Is tracking now enabled on the robot?", faceProxy.isTrackingEnabled())
-def set_Facetracking_off(faceProxy, motionProxy):
-    # Enable or disable tracking.
-    faceProxy.enableTracking(False)
-    motionProxy.setStiffnesses("Head", 0)
-    # Just to make sure correct option is set.
-    print("Is tracking now enabled on the robot?", faceProxy.isTrackingEnabled())
+    faceTrackerProxy.startTracker()
 
+def FacetrackingOff(faceTrackerProxy, motionProxy):
+    faceTrackerProxy.stopTracker()
+    motionProxy.setStiffnesses("Head", 0)
 
 def StiffnessOn(proxy):
     # We use the "Body" name to signify the collection of all joints
@@ -251,8 +258,8 @@ def Raisingbothhands(motionProxy):
 
     motionProxy.angleInterpolation(["RShoulderPitch", "LShoulderPitch"], [0, -0.62], 1, isAbsolute)
     # motionProxy.angleInterpolation("LShoulderPitch", -0.62, 1, isAbsolute)
-    motionProxy.angleInterpolation(["RShoulderRoll", "LShoulderRoll"], [[-0.47, 0.08],[-0.2, 1.1]], [[1, 2], [1, 2]], isAbsolute)
-    motionProxy.angleInterpolation(["RShoulderRoll", "LShoulderRoll"], [[0.08, -0.47],[1.1, -0.2]], [[1, 2], [1, 2]], isAbsolute)
+    motionProxy.angleInterpolation(["RShoulderRoll", "LShoulderRoll"], [[-0.47, 0.08],[-0.2, 0.6]], [[1, 2], [1, 2]], isAbsolute)
+    motionProxy.angleInterpolation(["RShoulderRoll", "LShoulderRoll"], [[0.08, -0.47],[0.6, -0.2]], [[1, 2], [1, 2]], isAbsolute)
     motionProxy.angleInterpolation("RElbowRoll", 0.5, 1, isAbsolute)
     motionProxy.angleInterpolation("RElbowYaw", 1 , 1, isAbsolute)
 
@@ -267,15 +274,12 @@ def Raisingbothhands(motionProxy):
         motionProxy.setStiffnesses(joint, 0)
 
 def AnkleLift(motionProxy):
-    print("AnkleLift")
 
     motionProxy.setStiffnesses("LAnklePitch", 0.8)
     isAbsolute = True
     for _ in range(3):
         motionProxy.angleInterpolation("LAnklePitch", [-0.8, -0.4], [1, 2], isAbsolute)
     motionProxy.setStiffnesses("LAnklePitch", 0)
-
-
 
 def Pointing(motionProxy, greetingProxy):
     print("Pointing")
@@ -287,7 +291,7 @@ def Pointing(motionProxy, greetingProxy):
 
 
     joints_move = ["RShoulderPitch", "RShoulderRoll", "RElbowYaw",  "RElbowRoll",  "RWristYaw"]
-    move_position = [0.21, -0.2,  0.57,  0.41, -0.9]
+    move_position = [0.21, -0.1,  0.57,  0.41, -0.9]
 
     motionProxy.angleInterpolation(joints_move, move_position, [[1], [1], [2], [2], [2]], isAbsolute)
     time.sleep(5)
@@ -309,15 +313,18 @@ def Pointing(motionProxy, greetingProxy):
 
 
 def idleBehavior(motionProxy):
-    rand_int = random.randint(0, 1)
-    if (rand_int%2 == 0):
+    rand_int = random.randint(0, 2)
+    if (rand_int%3 == 0):
         # 20s
-        print("idle1")
+        print("idle wrist")
         idleWrist(motionProxy)
         # time.sleep(10)
+    elif (rand_int%3 == 1):
+        print("ankle lift")
+        AnkleLift(motionProxy)
     else:
         # 60s
-        print("idle0")
+        print("idle head")
         idleHeadR(motionProxy)
         # time.sleep(10)
         idleHeadL(motionProxy)
