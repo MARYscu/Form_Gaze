@@ -6,6 +6,7 @@ import rospy
 from std_msgs.msg import String
 from nao_robot_study.msg import GameState
 from nao_robot_study.msg import TimeState
+from nao_robot_study.msg import GameUpdate
 from robot_behaviors import idleBehavior, StiffnessOff, HandControl_R, ArmControl_R_Waving, idleWrist
 
 from naoqi import ALProxy
@@ -14,6 +15,9 @@ gameInstructions = ["Hello my name is Nao!",  "The game instructions are on the 
 
 naoTips = ["Here is a helpful tip for the game.", "Try to associate the pattern of the numbers with something easier to remember, \
     such as a letter or a shape."]
+
+roundEncouragement = ["You're doing great!", "Nice job so far!", "You've gotten past so many rounds!", "Keep it up!", "Amazing!", 
+                      "Wow!", "I'm in awe!"]
 
 class RobotBehavior:
     def __init__(self, host, port):
@@ -24,9 +28,11 @@ class RobotBehavior:
         self.port = port
         self.instructions = True
         self.stiffnessoff = StiffnessOff
+        self.roundEncTrack = 0
         rospy.init_node('listener', anonymous=True)
         rospy.Subscriber("game_state", GameState, self.gamescore_msg_callback)
         rospy.Subscriber("time_state", TimeState, self.timestate_msg_callback)
+        rospy.Subscriber("game_update", GameUpdate, self.gameupdate_msg_callback)
 
         self.connectNao()
 
@@ -63,6 +69,13 @@ class RobotBehavior:
 
     def idleNaoBehavior(self, event=None):
         idleBehavior(self.motionProxy)
+
+    def gameupdate_msg_callback(self, data):
+        rounds = data.rounds
+        self.speechProxy.say(roundEncouragement[self.roundEncTrack])
+        self.roundEncTrack += 1
+        if self.roundEncTrack == len(roundEncouragement):
+            self.roundEncTrack = 0
 
     def gamescore_msg_callback(self, data):
         rospy.loginfo("Game ended.")
