@@ -10,14 +10,10 @@ from robot_behaviors import idleBehavior, StiffnessOff, HandControl_R, ArmContro
 
 from naoqi import ALProxy
 
-gameInstructions = ["Hello my name is Nao!",  "Today you will be playing a memory test game.", "You will have \
-    7 total minutes from the time you press the start button to play the game.", "To play the game, press the number tiles in order.",
-          "Starting from the second round, the numbers on the tiles will disappear after you press the first number.", 
-          "Try to get past as many rounds as you can!", "When you are ready, press the start game button to begin."]
+gameInstructions = ["Hello my name is Nao!",  "The game instructions are on the tablet screen.", "When you are ready, press the start game button to begin."]
 
-naoTips = ["Nice job! Here are some helpful tips for the game.", "Try to associate the pattern of the numbers with something easier to remember, \
-    such as a letter or a shape.", "Additionally, you might not need to memorize the position of the last number, \
-        as it will be the only tile left on the screen once you click all the other numbers."]
+naoTips = ["Here is a helpful tip for the game.", "Try to associate the pattern of the numbers with something easier to remember, \
+    such as a letter or a shape."]
 
 class RobotBehavior:
     def __init__(self, host, port):
