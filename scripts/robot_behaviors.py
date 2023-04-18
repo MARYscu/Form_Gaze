@@ -291,7 +291,7 @@ def Pointing(motionProxy, greetingProxy):
 
 
     joints_move = ["RShoulderPitch", "RShoulderRoll", "RElbowYaw",  "RElbowRoll",  "RWristYaw"]
-    move_position = [0.21, -0.1,  0.57,  0.41, -0.9]
+    move_position = [0.21, -0.4,  0.57,  1, -0.9]
 
     motionProxy.angleInterpolation(joints_move, move_position, [[1], [1], [2], [2], [2]], isAbsolute)
     time.sleep(5)
