@@ -60,6 +60,12 @@ class RobotBehavior:
         except Exception as e:
             print("Error when creating speech device proxy:" + str(e))
             exit(1)
+         
+        try:
+            self.memoryProxy = ALProxy("ALMemory", self.host, 9559)
+        except Exception as e:
+            print("Error when creating memory proxy:")
+            exit(1)
 
     def Nao_initial(self):
         self.stiffnessoff(self.motionProxy)
