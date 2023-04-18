@@ -286,7 +286,7 @@ def AnkleLift(motionProxy):
 def Pointing(motionProxy, greetingProxy):
     print("Pointing")
     joints_R = ["RShoulderRoll", "RWristYaw", "RElbowYaw", "RElbowRoll", "RShoulderPitch"]
-    default_R = { "RWristYaw": -0.46, "RElbowYaw": 0.86,  "RElbowRoll": 1, "RShoulderPitch": 1.54, "RShoulderRoll": -0.4}
+    default_R = { "RShoulderPitch": 1.54,"RWristYaw": -0.46, "RElbowYaw": 0.86,  "RElbowRoll": 1,  "RShoulderRoll": -0.4}
     isAbsolute = True
 
     isAbsolute = True
