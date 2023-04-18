@@ -240,8 +240,8 @@ def HandControl_R(motionProxy):
 # Left Arm is Broken
 def Raisingbothhands(motionProxy):
     print("Raisingbothhands")
-    joints_R = ["RShoulderRoll", "RWristYaw", "RElbowYaw", "RElbowRoll", "RShoulderPitch"]
-    default_R = {"RShoulderRoll": -0.4, "RWristYaw": -0.46, "RElbowYaw": 0.86,  "RElbowRoll": 1, "RShoulderPitch": 1.54 }
+    joints_R = ["RShoulderRoll", "RShoulderPitch", "RWristYaw", "RElbowYaw", "RElbowRoll"]
+    default_R = {"RShoulderRoll": -0.45, "RWristYaw": -0.46, "RElbowYaw": 0.86,  "RElbowRoll": 1, "RShoulderPitch": 1.54 }
     isAbsolute = True
     joints_L = ["LShoulderRoll", "LShoulderPitch"]
     # motionProxy.angleInterpolation("LShoulderPitch", [0, 0.8, -0.75, -0.8], [1, 2, 3, 4], isAbsolute)
@@ -258,20 +258,25 @@ def Raisingbothhands(motionProxy):
     for k,v in default_L.items():
         motionProxy.angleInterpolation(k, v, 1.0, isAbsolute)
 
-    motionProxy.angleInterpolation(["RShoulderPitch", "LShoulderPitch"], [0, -0.62], 1, isAbsolute)
+    motionProxy.angleInterpolation(["RShoulderPitch", "LShoulderPitch"], [-1.0, -1.0], 1, isAbsolute)
     # motionProxy.angleInterpolation("LShoulderPitch", -0.62, 1, isAbsolute)
     motionProxy.angleInterpolation(["RShoulderRoll", "LShoulderRoll"], [[-0.47, 0.08],[-0.2, 0.6]], [[1, 2], [1, 2]], isAbsolute)
     motionProxy.angleInterpolation(["RShoulderRoll", "LShoulderRoll"], [[0.08, -0.47],[0.6, -0.2]], [[1, 2], [1, 2]], isAbsolute)
-    motionProxy.angleInterpolation("RElbowRoll", 0.5, 1, isAbsolute)
-    motionProxy.angleInterpolation("RElbowYaw", 1 , 1, isAbsolute)
+    # motionProxy.angleInterpolation("RElbowRoll", 0.5, 1, isAbsolute)
+    # motionProxy.angleInterpolation("RElbowYaw", 1 , 1, isAbsolute)
 
     for k,v in default_R.items():
-        motionProxy.angleInterpolation(k, v, 1.0, isAbsolute)
+        if k == "RShoulderRoll":
+            motionProxy.angleInterpolation([k, "LShoulderRoll"], [v, default_L["LShoulderRoll"]], 1.5, isAbsolute)
+        elif k == "RShoulderPitch":
+            motionProxy.angleInterpolation([k, "LShoulderPitch"], [v, default_L["LShoulderPitch"]], 1.5, isAbsolute)
+        else:
+            motionProxy.angleInterpolation(k, v, 1.0, isAbsolute)
+    # for k,v in default_L.items():
+    #     motionProxy.angleInterpolation(k, v, 1.0, isAbsolute)
+
     for joint in joints_R:
         motionProxy.setStiffnesses(joint, 0)
-
-    for k,v in default_L.items():
-        motionProxy.angleInterpolation(k, v, 1.0, isAbsolute)
     for joint in joints_L:
         motionProxy.setStiffnesses(joint, 0)
 
@@ -304,20 +309,21 @@ def Pointing(motionProxy, greetingProxy):
     motionProxy.angleInterpolation(["RElbowYaw", "RWristYaw"], [0.57, -0.9], 1, isAbsolute)
 
 
-
-
-    motionProxy.angleInterpolation("RElbowRoll", 0.1, 1, isAbsolute)
-    motionProxy.angleInterpolation("RShoulderRoll", -1.1, 1, isAbsolute)
-    motionProxy.angleInterpolation("RShoulderPitch", 0.18, 1, isAbsolute)
-    motionProxy.angleInterpolation(["RElbowYaw", "RWristYaw"], [0.57, -0.9], 1, isAbsolute)
+    # motionProxy.angleInterpolation("RElbowRoll", 0.1, 1, isAbsolute)
+    # motionProxy.angleInterpolation("RShoulderRoll", -1.1, 1, isAbsolute)
+    # motionProxy.angleInterpolation("RShoulderPitch", 0.18, 1, isAbsolute)
+    # motionProxy.angleInterpolation(["RElbowYaw", "RWristYaw"], [0.57, -0.9], 1, isAbsolute)
 
     # motionProxy.angleInterpolation(joints_move, move_position, [[1], [1], [2], [2], [2]], isAbsolute)
-    time.sleep(5)
     vocal_distraction(greetingProxy)
     time.sleep(5)
 
-    for k,v in default_R.items():
-        motionProxy.angleInterpolation(k, v, 1.0, isAbsolute)
+    # for k,v in default_R.items():
+    #     motionProxy.angleInterpolation(k, v, 1.0, isAbsolute)
+    motionProxy.angleInterpolation(["RElbowYaw", "RWristYaw"], [0.86, -0.46], 1, isAbsolute)
+    motionProxy.angleInterpolation(["RShoulderPitch", "RShoulderRoll"] , [1.54, -0.45], 1, isAbsolute)
+    motionProxy.angleInterpolation("RElbowRoll", 1, 1, isAbsolute)
+
 
     for joint in joints_R:
         motionProxy.setStiffnesses(joint, 0)

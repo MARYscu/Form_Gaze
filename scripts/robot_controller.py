@@ -200,8 +200,10 @@ class RobotBehavior:
     def run(self):
         rospy.loginfo("initialized.")
         self.Nao_initial()
+        # FacetrackingOff(self.faceTracker, self.motionProxy)
         FacetrackingOn(self.faceTracker, self.motionProxy)
         # Pointing(self.motionProxy, self.speechProxy)
+        # Raisingbothhands(self.motionProxy)
         rospy.spin()
         
 
