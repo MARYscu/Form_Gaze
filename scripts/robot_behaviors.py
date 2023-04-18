@@ -50,7 +50,7 @@ def StiffnessOff(proxy):
 
 # NAO Speaking Functions
 def vocal_distraction(greetingProxy):
-    greeting_script = "Can you pass that red expo marker to me?"
+    greeting_script = "Can you put that red expo marker next to me?"
     greetingProxy.setParameter("speed", 80)
     greetingProxy.say(greeting_script)
 
