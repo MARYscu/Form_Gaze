@@ -2,6 +2,7 @@ import sys
 import time
 import random
 from naoqi import ALProxy
+import rospy
 
 
 
@@ -50,6 +51,7 @@ def StiffnessOff(proxy):
 # NAO Speaking Functions
 def vocal_distraction(greetingProxy):
     greeting_script = "Can you pass that red expo marker to me?"
+    greetingProxy.setParameter("speed", 80)
     greetingProxy.say(greeting_script)
 
 
@@ -297,7 +299,7 @@ def Pointing(motionProxy, greetingProxy):
     joints_move = ["RShoulderPitch", "RShoulderRoll", "RElbowYaw",  "RElbowRoll",  "RWristYaw"]
     move_position = [0.21, -0.4,  0.57,  1, -0.9]
     motionProxy.angleInterpolation("RShoulderRoll", -0.3, 1, isAbsolute)
-    motionProxy.angleInterpolation("RShoulderPitch", 0.3, 1, isAbsolute)
+    motionProxy.angleInterpolation("RShoulderPitch", 0.18, 1, isAbsolute)
     motionProxy.angleInterpolation(["RElbowYaw",  "RElbowRoll",  "RWristYaw"], [0.57, 1, -0.9], 1, isAbsolute)
 
     # motionProxy.angleInterpolation(joints_move, move_position, [[1], [1], [2], [2], [2]], isAbsolute)

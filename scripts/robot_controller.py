@@ -20,9 +20,9 @@ naoTips = ["Here is a helpful tip for the game.", "Try to associate the pattern 
 roundEncouragement = ["You're doing great!", "Nice job so far!", "You've gotten past so many rounds!", "Keep it up!", "Amazing!", 
                       "Wow!", "I'm in awe!"]
 
-sameOrLower = ["You can do it! Let's go again.", "Maybe not your highest score, but you're getting the hang of this!"]
+sameOrLower = ["You can do it! Let's go again.", "Maybe not your highest score, but you're getting the hang of this!", "Keep trying!", "Good effort, you'll improve your score soon."]
 
-higherScore = ["This time was your highest score yet! Let's keep going!", "You made an improvement on your high score again! You're doing great!"]
+higherScore = ["This time was your highest score yet! Let's keep going!", "You made an improvement on your high score again! You're doing great!", "You beat your high score!", "Fantastic work!"]
 
 class RobotBehavior:
     def __init__(self, host, port):
@@ -84,7 +84,7 @@ class RobotBehavior:
             print("Error when creating memory proxy:")
             exit(1)
 
-        self.timer = rospy.Timer(rospy.Duration(20), self.idleNaoBehavior)
+        # self.timer = rospy.Timer(rospy.Duration(20), self.idleNaoBehavior)
 
     def Nao_initial(self):
         self.stiffnessoff(self.motionProxy)
@@ -96,7 +96,8 @@ class RobotBehavior:
         idleBehavior(self.motionProxy)
 
     def gameupdate_msg_callback(self, data):
-        self.timer.shutdown()
+        if self.timer:
+            self.timer.shutdown()
         FacetrackingOn(self.faceTracker, self.motionProxy)
         self.speechProxy.say(roundEncouragement[self.roundEncTrack])
         self.roundEncTrack += 1
@@ -106,7 +107,8 @@ class RobotBehavior:
         self.timer = rospy.Timer(rospy.Duration(20), self.idleNaoBehavior)
 
     def gamescore_msg_callback(self, data):
-        self.timer.shutdown()
+        if self.timer:
+            self.timer.shutdown()
         FacetrackingOn(self.faceTracker, self.motionProxy)
         rospy.loginfo("Game ended.")
         score = data.roundsComplete
@@ -117,6 +119,7 @@ class RobotBehavior:
         
         if not gameInProgress:
             FacetrackingOn(self.faceTracker, self.motionProxy)
+
             naoLine = "Your final highest score is " + str(high_score) + "numbers. Good job!"
             self.speechProxy.say(naoLine)
             rospy.sleep(1)
@@ -124,12 +127,16 @@ class RobotBehavior:
             rospy.sleep(1)
             self.speechProxy.say("Please find Kelly or Mary to fill out the post study survey.")
         elif self.instructions and data.gameStart:
+            FacetrackingOn(self.faceTracker, self.motionProxy)
+
             idleWrist(self.motionProxy.post)
             for instruction in gameInstructions:
                 self.speechProxy.say(instruction)
                 rospy.sleep(1)
             self.instructions = False
         else:
+            FacetrackingOn(self.faceTracker, self.motionProxy)
+
             if self.callbackNum % 4 == 0:
                 naoLine = "You completed " + str(score) + "rounds."
                 self.speechProxy.say(naoLine)
@@ -155,7 +162,8 @@ class RobotBehavior:
         self.timer = rospy.Timer(rospy.Duration(20), self.idleNaoBehavior)
     
     def timestate_msg_callback(self, data):
-        self.timer.shutdown()
+        if self.timer:
+            self.timer.shutdown()
         minutesRemaining = int(round(data.minutesLeft / 60))
         rospy.loginfo("time update: %d minutes remaining", minutesRemaining)
         if minutesRemaining == 1:
@@ -163,7 +171,8 @@ class RobotBehavior:
             naoLine = "You have 1 minute remaining."
             self.speechProxy.say(naoLine)
         elif minutesRemaining == 6:
-            self.timer.shutdown()
+            if self.timer:
+                self.timer.shutdown()
             Scratching_Head(self.motionProxy)
         elif minutesRemaining == 5:
             ArmControl_R_Waving(self.motionProxy)
@@ -175,6 +184,8 @@ class RobotBehavior:
                 self.speechProxy.say(tip)
                 rospy.sleep(1)
         elif minutesRemaining == 3:
+            if self.timer:
+                self.timer.shutdown()
             FacetrackingOn(self.faceTracker, self.motionProxy)
             Pointing(self.motionProxy, self.speechProxy) 
         elif minutesRemaining == 2:
@@ -189,7 +200,8 @@ class RobotBehavior:
     def run(self):
         rospy.loginfo("initialized.")
         self.Nao_initial()
-        Pointing(self.motionProxy, self.speechProxy)
+        FacetrackingOn(self.faceTracker, self.motionProxy)
+        # Pointing(self.motionProxy, self.speechProxy)
         rospy.spin()
         
 
