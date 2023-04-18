@@ -12,6 +12,7 @@ add_message_files(
     FILES
     GameState.msg
     TimeState.msg
+    GameUpdate.msg
 )
 
 generate_messages(
