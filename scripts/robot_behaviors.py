@@ -116,12 +116,19 @@ def ArmControl_R_Waving(motionProxy):
     for k,v in default.items():
         motionProxy.angleInterpolation(k, v, 1.0, isAbsolute)
 
-    # Raise hand and Wave
-    names= ["RShoulderPitch", "RElbowRoll"]
-    targetAngles = [[0, -0.78], [0.2, 1.3]]
-    timeList = [[1.0, 2.0], [2.0, 4.0]]
 
-    motionProxy.angleInterpolation(names, targetAngles, timeList, isAbsolute)
+    motionProxy.angleInterpolation("RShoulderRoll", -0.6, 1, isAbsolute)
+    # Raise hand and Wave
+
+    motionProxy.angleInterpolation("RShoulderPitch", [0, -0.78], [1.0, 2.0], isAbsolute)
+
+    for _ in range(3):
+        names= ["RElbowRoll", "RShoulderRoll"]
+        targetAngles = [[0.2, 1.3], [0, -0.8]]
+        timeList = [[1.0, 2.0], [1.0, 2.0]]
+
+        motionProxy.angleInterpolation(names, targetAngles, timeList, isAbsolute)
+
 
     # back to default
     for k,v in default.items():
