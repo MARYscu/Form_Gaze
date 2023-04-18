@@ -283,13 +283,15 @@ def AnkleLift(motionProxy):
 
 def Pointing(motionProxy, greetingProxy):
     print("Pointing")
-    joints_R = ["RShoulderPitch", "RElbowRoll", "RShoulderRoll", "RElbowYaw", "RWristYaw"]
-    default_R = {"RShoulderPitch": 1.54, "RWristYaw": -0.46, "RElbowYaw": 0.86, "RShoulderRoll": -0.4, "RElbowRoll": 1}
+    joints_R = ["RShoulderRoll", "RWristYaw", "RElbowYaw", "RElbowRoll", "RShoulderPitch"]
+    default_R = {"RShoulderRoll": -0.4, "RWristYaw": -0.46, "RElbowYaw": 0.86,  "RElbowRoll": 1, "RShoulderPitch": 1.54 }
     isAbsolute = True
+
     for joint in joints_R:
         motionProxy.setStiffnesses(joint, 0.8)
     for k,v in default_R.items():
         motionProxy.angleInterpolation(k, v, 1.0, isAbsolute)
+
 
 
     joints_move = ["RShoulderPitch", "RShoulderRoll", "RElbowYaw",  "RElbowRoll",  "RWristYaw"]
