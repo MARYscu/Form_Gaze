@@ -330,12 +330,6 @@ def Pointing(motionProxy, greetingProxy):
 
     print("Pointing End")
 
-
-
-
-
-
-
 def idleBehavior(motionProxy):
     rand_int = random.randint(0, 2)
     if (rand_int%3 == 0):
