@@ -303,9 +303,10 @@ def Pointing(motionProxy, greetingProxy):
 
     joints_move = ["RShoulderPitch", "RShoulderRoll", "RElbowYaw",  "RElbowRoll",  "RWristYaw"]
     move_position = [0.21, -0.4,  0.57,  1, -0.9]
-    motionProxy.angleInterpolation("RElbowRoll", 0.1, 1, isAbsolute)
+    motionProxy.angleInterpolation("RElbowRoll", 0.6, 1, isAbsolute)
     motionProxy.angleInterpolation("RShoulderRoll", -1.1, 1, isAbsolute)
     motionProxy.angleInterpolation("RShoulderPitch", 0.18, 1, isAbsolute)
+    motionProxy.angleInterpolation("RElbowRoll", 0.1, 1, isAbsolute)
     motionProxy.angleInterpolation(["RElbowYaw", "RWristYaw"], [0.57, -0.9], 1, isAbsolute)
 
 
@@ -368,4 +369,3 @@ def eye_tracking(memoryProxy, faceProxy, motionProxy):
             increment -= 0.15
             motionProxy.angleInterpolation("HeadYaw",increment , 1, True)
     return increment
-
