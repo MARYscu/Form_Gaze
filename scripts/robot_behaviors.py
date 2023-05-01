@@ -53,6 +53,8 @@ def vocal_distraction(greetingProxy):
     greeting_script = "Can you put that red expo marker next to me?"
     greetingProxy.setParameter("speed", 80)
     greetingProxy.say(greeting_script)
+    greetingProxy.setParameter("speed", 90)
+
 
 
 # def human_control_response(greetingProxy):
@@ -291,7 +293,7 @@ def AnkleLift(motionProxy):
 def Pointing(motionProxy, greetingProxy):
     print("Pointing")
     joints_R = ["RShoulderRoll", "RWristYaw", "RElbowYaw", "RElbowRoll", "RShoulderPitch"]
-    default_R = { "RShoulderPitch": 1.54,"RWristYaw": -0.46, "RElbowYaw": 0.86,  "RElbowRoll": 1,  "RShoulderRoll": -0.4}
+    default_R = { "RWristYaw": -0.46, "RElbowYaw": 0.86,  "RElbowRoll": 1, "RShoulderPitch": 1.54, "RShoulderRoll": -0.4}
     isAbsolute = True
 
     isAbsolute = True
@@ -303,9 +305,10 @@ def Pointing(motionProxy, greetingProxy):
 
     joints_move = ["RShoulderPitch", "RShoulderRoll", "RElbowYaw",  "RElbowRoll",  "RWristYaw"]
     move_position = [0.21, -0.4,  0.57,  1, -0.9]
-    motionProxy.angleInterpolation("RElbowRoll", 0.1, 1, isAbsolute)
+    motionProxy.angleInterpolation("RElbowRoll", 0.6, 1, isAbsolute)
     motionProxy.angleInterpolation("RShoulderRoll", -1.1, 1, isAbsolute)
     motionProxy.angleInterpolation("RShoulderPitch", 0.18, 1, isAbsolute)
+    motionProxy.angleInterpolation("RElbowRoll", 0.1, 1, isAbsolute)
     motionProxy.angleInterpolation(["RElbowYaw", "RWristYaw"], [0.57, -0.9], 1, isAbsolute)
 
 
@@ -321,7 +324,7 @@ def Pointing(motionProxy, greetingProxy):
     # for k,v in default_R.items():
     #     motionProxy.angleInterpolation(k, v, 1.0, isAbsolute)
     motionProxy.angleInterpolation(["RElbowYaw", "RWristYaw"], [0.86, -0.46], 1, isAbsolute)
-    motionProxy.angleInterpolation(["RShoulderPitch", "RShoulderRoll"] , [1.54, -0.45], 1, isAbsolute)
+    motionProxy.angleInterpolation(["RShoulderPitch", "RShoulderRoll"] , [1.54, -0.45], [1, 2], isAbsolute)
     motionProxy.angleInterpolation("RElbowRoll", 1, 1, isAbsolute)
 
 
@@ -336,7 +339,6 @@ def idleBehavior(motionProxy):
         # 20s
         print("idle wrist")
         idleWrist(motionProxy)
-        # time.sleep(10)
     elif (rand_int%3 == 1):
         print("ankle lift")
         AnkleLift(motionProxy)
