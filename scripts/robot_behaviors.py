@@ -4,8 +4,6 @@ import random
 from naoqi import ALProxy
 import rospy
 
-
-
 #reference
 # http://www.cs.cmu.edu/~cga/nao/doc/reference-documentation/nao/hardware/kinematics/nao-joints-32.html#hardware-kin-v3-2-left-arm-joints
 
