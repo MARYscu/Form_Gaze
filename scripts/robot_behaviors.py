@@ -368,4 +368,3 @@ def eye_tracking(memoryProxy, faceProxy, motionProxy):
             increment -= 0.15
             motionProxy.angleInterpolation("HeadYaw",increment , 1, True)
     return increment
-
